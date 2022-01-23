@@ -9,21 +9,34 @@ const ReactFirebaseFileUpload = () => {
   const [video, setVideos] = useState(null);
   const [image, setImages] = useState(null);
   const [vidupload, setVideosUpload] = useState(false)
+  const [viddelete, setVideosDelete] = useState(false)
   const [imgupload, setImagesUpload] = useState(false)
+  const [imgdelete, setImagesDelete] = useState(false)
   const [imgchange, setimgChange] = useState(false)
   const [vidchange, setvidChange] = useState(false)
   const [url, setUrl] = useState("");
   const [imgprogress, setimgProgress] = useState(0);
   const [vidprogress, setvidProgress] = useState(0);
   // var Url = "https://firebasestorage.googleapis.com/v0/b/game-24c03.appspot.com/o/images%2FReveal%20your%20logo%20with%20HORROR%20Lamp%20Bloody%20wall%20Halloween%20video%20intro.mp4?alt=media&token=7ed98970-8e7f-467f-866b-53b55c988bf4"
-  // var desertRef = storage.ref(`images/Bhadwa.mp4`);
-  // const deleteUpload = () => {
-  //   desertRef.delete().then(() => {
-  //     console.log("File deleted successfully")
-  //   }).catch((error) => {
-  //     console.log("Error")
-  //   });
-  // }
+  if (video)
+    var desertRef = storage.ref(`videos/${video.name}`);
+  else
+    var desertRef = storage.ref("videos/");
+
+  const videoDeleteUpload = () => {
+    desertRef.delete().then(() => {
+      setVideosDelete(true)
+    }).catch((error) => {
+      alert("Video cant be delete!!! Please try again after sometime")
+    });
+  }
+  const imageDeleteUpload = () => {
+    desertRef.delete().then(() => {
+      setImagesDelete(true)
+    }).catch((error) => {
+      alert("Video cant be delete!!! Please try again after sometime")
+    });
+  }
   const handleVideoChange = e => {
     if (e.target.files[0]) {
       setVideos(e.target.files[0]);
@@ -33,7 +46,10 @@ const ReactFirebaseFileUpload = () => {
   const handleImageChange = e => {
     if (e.target.files[0]) {
       setImages(e.target.files[0]);
-      setImagesUpload(true)
+      if (vidupload)
+        setImagesUpload(true)
+      else
+        alert("Please upload a video first")
     }
   };
 
@@ -112,21 +128,28 @@ const ReactFirebaseFileUpload = () => {
             <input type="file" onChange={handleVideoChange} accept="video/*" />
 
             <button className={vidprogress === 100 ? "btn btn-success S-button" : "btn btn-dark S-btn"} onClick={handleVideoUpload}>{vidprogress !== 100 ? <div><span><i class="fad fa-play-circle  S-icon"></i></span><span>Upload</span></div> : <div><span><i class="fad fa-check-circle S-icon"></i></span><span>Uploaded</span></div>}</button>
+            {vidprogress === 100 ? <button onClick={videoDeleteUpload} className="btn btn-danger">{!viddelete ? <div><span><i class="fad fa-times-circle S-icon"></i></span><span>Delete</span></div> : <span>Deleted</span>}</button> : ""}
+
           </div>
 
-          {imgupload ? <div className="S-react-player"><div>PREVIEW</div><img src={URL.createObjectURL(image)} alt="" width="100%" /></div> : <div>Upload a Thumbnail</div>}
-          <div className="image-upload">
+          {vidupload ? imgupload ? <div className="S-react-player"><div>PREVIEW</div><img src={URL.createObjectURL(image)} alt="" width="100%" /></div> : <div>Upload a Thumbnail</div> : ""}
+          {vidupload ? <div className="image-upload">
             {imgchange && imgprogress !== 100 ? <div className="S-progress">
               <progress className="S-progress-bar" value={imgprogress} max="100" /><span>{imgprogress}%</span>
             </div> : ""}
             <div className="video">Thumbnail Upload</div>
             <input type="file" onChange={handleImageChange} accept="image/*" />
             <button className={imgprogress === 100 ? "btn btn-success S-button" : "btn btn-dark S-btn"} onClick={handleImageUpload}>{imgprogress !== 100 ? <div><span><i class="fal fa-image S-icon"></i></span><span>Upload</span></div> : <div><span><i class="fad fa-check-circle S-icon"></i></span><span>Uploaded</span></div>}</button>
-          </div>
-          {/* {progress === 100 ? <button className={progress === 100 ? "btn btn-danger S-button" : "btn btn-dark S-btn"} onClick={deleteUpload}><div><span><i class="fad fa-trash-alt"></i></span><span>Delete</span></div></button> : ""} */}
+            {imgprogress === 100 ? <button onClick={imageDeleteUpload} className="btn btn-danger">{!imgdelete ? <div><span><i class="fad fa-times-circle S-icon"></i></span><span>Delete</span></div> : <span>Deleted</span>}</button> : ""}
+          </div> : ""}
         </div>
       </div>
-    </div >
+      <div className="S-final">
+        <button className="btn btn-success"><span><i class="fad fa-check-square S-icon"></i></span><span>Done</span></button>
+        <button className="btn btn-danger"><span></span><i class="fad fa-times-circle S-icon"></i><span>Cancel</span></button>
+      </div>
+    </div>
+
   );
 };
 
